@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<implementation>
+  <functions>
+    package.loaded.L_MpcMaster = nil
+    mpcmultctrl = require ("L_MpcMaster")    
+	MPCMULTCTRL_SERVICE = mpcmultctrl.MPCMULTCTRL_SERVICE
+    function nextMultiStep()
+	  mpcmultctrl.doNextStep()
+    end	
+    function startup(lul_device)
+	  mpcmultctrl.initialize(lul_device)
+    end
+  </functions>
+  <incoming>
+      luup.log("when does this happen")
+  </incoming>
+  <startup>startup</startup>
+  <actionList>
+    <action>
+      <serviceId>urn:demo-micasaverde-com:serviceId:MpcMultipleControl1</serviceId>
+      <name>setMpcs</name>
+      <run>
+        luup.variable_set(MPCMULTCTRL_SERVICE, "mpcid1", lul_settings.xId1 or "", lul_device)
+		luup.variable_set(MPCMULTCTRL_SERVICE, "mpcid2", lul_settings.xId2 or "", lul_device)
+		luup.variable_set(MPCMULTCTRL_SERVICE, "boundary", lul_settings.xBoundary or "", lul_device)
+		luup.variable_set(MPCMULTCTRL_SERVICE, "samplePeriod", lul_settings.xSamplePeriod or "", lul_device)
+      </run>
+    </action>	  	
+    <action>
+      <serviceId>urn:demo-micasaverde-com:serviceId:MpcMultipleControl1</serviceId>
+      <name>setSetpoint</name>
+      <run>
+        luup.variable_set(MPCMULTCTRL_SERVICE, "setpoint", lul_settings.xSetpoint or "", lul_device)
+      </run>
+    </action>	
+    <action>
+      <serviceId>urn:demo-micasaverde-com:serviceId:MpcMultipleControl1</serviceId>
+      <name>setBypass</name>
+      <run>
+        luup.variable_set(MPCMULTCTRL_SERVICE, "bypass", "1", lul_device)
+      </run>
+    </action>		
+    <action>
+      <serviceId>urn:demo-micasaverde-com:serviceId:MpcMultipleControl1</serviceId>
+      <name>unsetBypass</name>
+      <run>
+        luup.variable_set(MPCMULTCTRL_SERVICE, "bypass", "0", lul_device)
+		if lul_settings.xSetpoint == nil then
+		  lsetpoint=luup.variable_get(MPCMULTCTRL_SERVICE, "setpoint",lul_device)
+		else
+		  lsetpoint = lul_settings.xSetpoint
+		end
+		luup.variable_set(MPCMULTCTRL_SERVICE, "setpoint", lsetpoint, lul_device)
+		mpcmultctrl.doNextStep()
+      </run>
+    </action>			
+  </actionList>
+</implementation>
