@@ -157,16 +157,21 @@ function doNextStep()
 
 		local lcDV = 0
 		local lcACT = "getStep"
-
-		if setpoint < boundary then
+		
+		debug ("!!!!!!!!!!!!!!! setpoint: " .. setpoint .. " < " .. boundary)
+		if tonumber(setpoint) < tonumber(boundary) then
 		    lcDV = mpcid1
+			debug ("!!!!!!!!!!!!!!! if part")
 		else
 		    lcDV = mpcid2
+			debug ("!!!!!!!!!!!!!!! else part")
 		end
 		debug ("device id: " .. lcDV)
 		lcDV= tonumber(lcDV)
 		-- disable bypass (so controller can run)
 		luup.variable_set(CLIENT_SERVICE, "bypass", "0", lcDV)
+		-- set setpoint
+		luup.variable_set(CLIENT_SERVICE, "setpoint", setpoint, lcDV)
 		-- call next step with specific MPC
 		local resultCode, resultString, job, returnArguments = luup.call_action(CLIENT_SERVICE, lcACT, { }, lcDV)
 		debug ("resultCode" .. resultCode)
